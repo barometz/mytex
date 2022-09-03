@@ -6,7 +6,7 @@ option(mytex_TESTS "Build Mytex tests" ON)
 add_library(baudvine-mytex INTERFACE)
 
 target_include_directories(baudvine-mytex INTERFACE include)
-target_compile_features(baudvine-mytex INTERFACE cxx_std_11)
+target_compile_features(baudvine-mytex INTERFACE cxx_std_17)
 
 if (MSVC)
     add_compile_options(
