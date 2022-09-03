@@ -58,9 +58,8 @@ class Mytex {
     LockT lock(mutex_, std::try_to_lock);
     if (lock.owns_lock()) {
       return {&object_, std::move(lock)};
-    } else {
-      return {};
     }
+    return {};
   }
 
  private:
