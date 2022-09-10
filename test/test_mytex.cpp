@@ -202,17 +202,30 @@ TEST(Mytex, OptionalGuardComparison)
   EXPECT_LE(one.TryLockShared(), two.TryLockShared());
   EXPECT_GT(two.TryLock(), one.TryLock());
   EXPECT_GE(two.TryLock(), one.TryLock());
+  EXPECT_GE(one.TryLockShared(), one.TryLockShared());
+  EXPECT_LE(one.TryLockShared(), one.TryLockShared());
+
+  // Comparison with empty guards.
+  baudvine::Mytex<uint64_t> three(3);
+  auto threeGuard = three.Lock();
+  EXPECT_EQ(three.TryLock(), three.TryLock());
+  EXPECT_LT(three.TryLock(), one.TryLock());
+  EXPECT_GT(one.TryLock(), three.TryLock());
+  EXPECT_NE(three.TryLock(), one.TryLock());
+  EXPECT_LE(three.TryLock(), one.TryLock());
+  EXPECT_GE(one.TryLock(), three.TryLock());
 
   {
     // Additionally, you can compare with nullopt for emptiness
-    EXPECT_NE(one.TryLock(), std::nullopt);
-    EXPECT_GT(one.TryLock(), std::nullopt);
-    EXPECT_GE(one.TryLock(), std::nullopt);
-    EXPECT_LT(std::nullopt, one.TryLock());
-    EXPECT_LE(std::nullopt, one.TryLock());
-    auto guard = one.Lock();
-    EXPECT_EQ(one.TryLock(), std::nullopt);
-    // // As well as compare to non-optional guards
+    // EXPECT_NE(one.TryLock(), std::nullopt);
+    // EXPECT_GT(one.TryLock(), std::nullopt);
+    // EXPECT_GE(one.TryLock(), std::nullopt);
+    // EXPECT_LT(std::nullopt, one.TryLock());
+    // EXPECT_LE(std::nullopt, one.TryLock());
+    // auto guard = one.Lock();
+    // EXPECT_EQ(one.TryLock(), std::nullopt);
+    // As well as compare to non-optional guards
+    // EXPECT_NE(two.TryLock(), guard);
     // EXPECT_NE(guard, two.TryLock());
     // *guard = 2;
     // EXPECT_EQ(two.TryLock(), guard);

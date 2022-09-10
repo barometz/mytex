@@ -37,126 +37,126 @@ private:
 };
 
 template<typename T, typename Lock, typename U, typename L>
-bool
+inline bool
 operator==(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return *lhs == *rhs;
-  }
+{
+  return *lhs == *rhs;
+}
 
 template<typename T, typename Lock, typename U, typename L>
-bool
+inline bool
 operator!=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return !(lhs == rhs);
-  }
+{
+  return !(lhs == rhs);
+}
 
 template<typename T, typename Lock, typename U, typename L>
-bool
+inline bool
 operator<(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return *lhs < *rhs;
-  }
+{
+  return *lhs < *rhs;
+}
 
 template<typename T, typename Lock, typename U, typename L>
-bool
+inline bool
 operator>(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return rhs < lhs;
-  }
+{
+  return rhs < lhs;
+}
 
 template<typename T, typename Lock, typename U, typename L>
-bool
+inline bool
 operator<=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return !(lhs > rhs);
-  }
+{
+  return !(lhs > rhs);
+}
 
 template<typename T, typename Lock, typename U, typename L>
-bool
+inline bool
 operator>=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
 {
   return !(lhs < rhs);
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator==(const MytexGuard<T, Lock>& lhs, const U& rhs)
 {
   return *lhs == rhs;
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator==(const U& lhs, const MytexGuard<T, Lock>& rhs)
 {
   return lhs == *rhs;
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator!=(const MytexGuard<T, Lock>& lhs, const U& rhs)
 {
   return !(lhs == rhs);
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator!=(const U& lhs, const MytexGuard<T, Lock>& rhs)
 {
   return !(lhs == rhs);
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator<(const MytexGuard<T, Lock>& lhs, const U& rhs)
 {
   return *lhs < rhs;
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator<(const U& lhs, const MytexGuard<T, Lock>& rhs)
 {
   return lhs < *rhs;
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator>(const MytexGuard<T, Lock>& lhs, const U& rhs)
 {
   return rhs < lhs;
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator>(const U& lhs, const MytexGuard<T, Lock>& rhs)
 {
   return rhs < lhs;
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator>=(const MytexGuard<T, Lock>& lhs, const U& rhs)
-  {
-    return !(lhs < rhs);
-  }
+{
+  return !(lhs < rhs);
+}
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator>=(const U& lhs, const MytexGuard<T, Lock>& rhs)
 {
   return !(lhs < rhs);
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator<=(const MytexGuard<T, Lock>& lhs, const U& rhs)
 {
   return !(lhs > rhs);
 }
 
 template<typename T, typename Lock, typename U>
-bool
+inline bool
 operator<=(const U& lhs, const MytexGuard<T, Lock>& rhs)
 {
   return !(lhs > rhs);
@@ -203,123 +203,63 @@ public:
   T* operator->() noexcept { return &**this; }
   const T* operator->() const noexcept { return &**this; }
 
-  template<typename U, typename L>
-  friend bool operator==(const OptionalMytexGuard& lhs,
-                         const OptionalMytexGuard<U, L>& rhs)
-  {
-    return *lhs == *rhs;
-  }
-
-  template<typename U, typename L>
-  friend bool operator!=(const OptionalMytexGuard& lhs,
-                         const OptionalMytexGuard<U, L>& rhs)
-  {
-    return !(lhs == rhs);
-  }
-
-  template<typename U, typename L>
-  friend bool operator<(const OptionalMytexGuard& lhs,
-                        const OptionalMytexGuard<U, L>& rhs)
-  {
-    return *lhs < *rhs;
-  }
-
-  template<typename U, typename L>
-  friend bool operator>(const OptionalMytexGuard& lhs,
-                        const OptionalMytexGuard<U, L>& rhs)
-  {
-    return rhs < lhs;
-  }
-
-  template<typename U, typename L>
-  friend bool operator<=(const OptionalMytexGuard& lhs,
-                         const OptionalMytexGuard<U, L>& rhs)
-  {
-    return !(lhs > rhs);
-  }
-
-  template<typename U, typename L>
-  friend bool operator>=(const OptionalMytexGuard& lhs,
-                         const OptionalMytexGuard<U, L>& rhs)
-  {
-    return !(lhs < rhs);
-  }
-
-  friend bool operator==(const OptionalMytexGuard& lhs,
-                         const std::nullopt_t& rhs)
-  {
-    return lhs.mInner == rhs;
-  }
-
-  friend bool operator==(const std::nullopt_t& lhs,
-                         const OptionalMytexGuard& rhs)
-  {
-    return lhs == rhs.mInner;
-  }
-
-  friend bool operator!=(const OptionalMytexGuard& lhs,
-                         const std::nullopt_t& rhs)
-  {
-    return !(lhs == rhs);
-  }
-
-  friend bool operator!=(const std::nullopt_t& lhs,
-                         const OptionalMytexGuard& rhs)
-  {
-    return !(lhs == rhs);
-  }
-
-  friend bool operator<(const OptionalMytexGuard& lhs,
-                        const std::nullopt_t& rhs)
-  {
-    return lhs.mInner < rhs;
-  }
-
-  friend bool operator<(const std::nullopt_t& lhs,
-                        const OptionalMytexGuard& rhs)
-  {
-    return lhs < rhs.mInner;
-  }
-
-  friend bool operator>(const OptionalMytexGuard& lhs,
-                        const std::nullopt_t& rhs)
-  {
-    return rhs < lhs;
-  }
-
-  friend bool operator>(const std::nullopt_t& lhs,
-                        const OptionalMytexGuard& rhs)
-  {
-    return rhs < lhs;
-  }
-
-  friend bool operator<=(const OptionalMytexGuard& lhs,
-                         const std::nullopt_t& rhs)
-  {
-    return !(lhs > rhs);
-  }
-
-  friend bool operator<=(const std::nullopt_t& lhs,
-                         const OptionalMytexGuard& rhs)
-  {
-    return !(lhs > rhs);
-  }
-
-  friend bool operator>=(const OptionalMytexGuard& lhs,
-                         const std::nullopt_t& rhs)
-  {
-    return !(lhs < rhs);
-  }
-
-  friend bool operator>=(const std::nullopt_t& lhs,
-                         const OptionalMytexGuard& rhs)
-  {
-    return !(lhs < rhs);
-  }
-
 private:
   std::optional<MytexGuard<T, Lock>> mInner{};
 };
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator==(const OptionalMytexGuard<T, L1>& lhs,
+           const OptionalMytexGuard<U, L2>& rhs)
+{
+  if (lhs.has_value()) {
+    return rhs.has_value() && *lhs == *rhs;
+  }
+  return !rhs.has_value();
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator!=(const OptionalMytexGuard<T, L1>& lhs,
+           const OptionalMytexGuard<U, L2>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator<(const OptionalMytexGuard<T, L1>& lhs,
+          const OptionalMytexGuard<U, L2>& rhs)
+{
+  if (lhs.has_value()) {
+    return rhs.has_value() && *lhs < *rhs;
+  }
+  return rhs.has_value();
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator>(const OptionalMytexGuard<T, L1>& lhs,
+          const OptionalMytexGuard<U, L2>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator<=(const OptionalMytexGuard<T, L1>& lhs,
+           const OptionalMytexGuard<U, L2>& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator>=(const OptionalMytexGuard<T, L1>& lhs,
+           const OptionalMytexGuard<U, L2>& rhs)
+{
+  return !(lhs < rhs);
+}
 
 /** @brief A mutex that owns the resource it guards.
  *
