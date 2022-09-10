@@ -81,7 +81,12 @@ private:
   std::optional<MytexGuard<T, Lock>> mInner{};
 };
 
-/** @brief A mutex that owns the resource it guards. */
+/** @brief A mutex that owns the resource it guards.
+ *
+ * By default this uses std::shared_mutex, but any class that supports the
+ * Lockable requirements should work. If it supports SharedLockable,
+ * LockShared() will work as well.
+ */
 template<typename T, typename Lockable = std::shared_mutex>
 class Mytex
 {
@@ -93,6 +98,19 @@ public:
   using OptionalGuard = OptionalMytexGuard<T, ExclusiveLock>;
   using SharedOptionalGuard = OptionalMytexGuard<const T, SharedLock>;
 
+  /**
+   * @brief Construct a new Mytex with an existing mutex and initialize the
+   * contained resource.
+   *
+   * This is useful when you have a specialized mutex that can't be
+   * default-constructed, such as:
+   * - An inter-process named mutex
+   * - A deferred lock that controls multiple mutexes
+   * - A std::unique_lock for another mutex
+   *
+   * @param mutex The mutex to use.
+   * @param args  Constructor parameters for the contained object.
+   */
   template<typename... Args>
   Mytex(Lockable mutex, Args&&... initialize)
     : mObject(std::forward<Args>(initialize)...)
@@ -100,7 +118,11 @@ public:
   {
   }
 
-  /** @brief Construct a new Mytex and initialize the contained resource. */
+  /**
+   * @brief Construct a new Mytex and initialize the contained resource.
+   *
+   * @param args Constructor parameters for the contained object.
+   */
   template<typename... Args>
   Mytex(Args&&... initialize)
     : mObject(std::forward<Args>(initialize)...)
