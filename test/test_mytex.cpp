@@ -150,3 +150,89 @@ TEST(Mytex, SharedLock)
   // again.
   EXPECT_THAT(underTest.TryLock(), testing::Optional(500));
 }
+
+TEST(Mytex, GuardEquality)
+{
+  baudvine::Mytex<int32_t> one(6);
+  baudvine::Mytex<int64_t> two(6);
+
+  EXPECT_EQ(one.LockShared(), one.LockShared());
+  EXPECT_EQ(one.Lock(), two.LockShared());
+  *one.Lock() = 5;
+  EXPECT_NE(one.LockShared(), two.Lock());
+  EXPECT_EQ(one.Lock(), 5);
+  EXPECT_NE(two.Lock(), 5);
+}
+
+TEST(Mytex, GuardComparison)
+{
+  baudvine::Mytex<uint32_t> one(1U);
+  baudvine::Mytex<uint64_t> two(2U);
+
+  EXPECT_GE(two.Lock(), one.LockShared());
+  EXPECT_GE(two.LockShared(), two.LockShared());
+  EXPECT_LE(one.Lock(), two.LockShared());
+  EXPECT_LE(one.LockShared(), one.LockShared());
+  EXPECT_LT(one.Lock(), two.LockShared());
+  EXPECT_GT(two.Lock(), one.LockShared());
+
+  EXPECT_GT(5U, one.Lock());
+  EXPECT_GE(5U, one.Lock());
+  EXPECT_LE(1U, two.Lock());
+  EXPECT_LT(1U, two.Lock());
+
+  *one.Lock() = 2;
+  EXPECT_GE(two.LockShared(), one.Lock());
+  EXPECT_LE(one.LockShared(), two.Lock());
+
+  *two.Lock() = 1;
+  EXPECT_LT(two.LockShared(), one.Lock());
+  EXPECT_GT(one.LockShared(), two.Lock());
+}
+
+TEST(Mytex, OptionalGuardComparison)
+{
+  baudvine::Mytex<uint32_t> one(1U);
+  baudvine::Mytex<uint64_t> two(2U);
+
+  // The basics are passed on to MytexGuard
+  EXPECT_EQ(one.TryLockShared(), one.TryLockShared());
+  EXPECT_NE(one.TryLock(), two.TryLockShared());
+  EXPECT_LT(one.TryLockShared(), two.TryLockShared());
+  EXPECT_LE(one.TryLockShared(), two.TryLockShared());
+  EXPECT_GT(two.TryLock(), one.TryLock());
+  EXPECT_GE(two.TryLock(), one.TryLock());
+  EXPECT_GE(one.TryLockShared(), one.TryLockShared());
+  EXPECT_LE(one.TryLockShared(), one.TryLockShared());
+
+  // Comparison with empty guards.
+  baudvine::Mytex<uint64_t> three(3);
+  auto threeGuard = three.Lock();
+  EXPECT_EQ(three.TryLock(), three.TryLock());
+  EXPECT_LT(three.TryLock(), one.TryLock());
+  EXPECT_GT(one.TryLock(), three.TryLock());
+  EXPECT_NE(three.TryLock(), one.TryLock());
+  EXPECT_LE(three.TryLock(), one.TryLock());
+  EXPECT_GE(one.TryLock(), three.TryLock());
+
+  // Comparison with value type, just like MytexGuard
+  EXPECT_EQ(one.TryLock(), 1U);
+  EXPECT_NE(two.TryLock(), 5U);
+  EXPECT_GT(two.TryLock(), 1U);
+  EXPECT_GE(two.TryLock(), 1U);
+  EXPECT_LT(0U, one.TryLock());
+  EXPECT_LE(0U, one.TryLock());
+
+  // Comparison between MytexGuard and OptionalMytexGuard unfortunately doesn't
+  // quite work, so you need to explicitly deref in that case.
+  EXPECT_LT(one.TryLock(), *two.Lock());
+
+  // Additionally, you can compare with nullopt for emptiness
+  EXPECT_NE(one.TryLock(), std::nullopt);
+  EXPECT_GT(one.TryLock(), std::nullopt);
+  EXPECT_GE(one.TryLock(), std::nullopt);
+  EXPECT_LT(std::nullopt, one.TryLock());
+  EXPECT_LE(std::nullopt, one.TryLock());
+  auto guard = one.Lock();
+  EXPECT_EQ(one.TryLock(), std::nullopt);
+}

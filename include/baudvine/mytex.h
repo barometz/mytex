@@ -12,6 +12,8 @@ namespace baudvine {
  *
  * \c MytexGuard holds the lock it was created with until it goes out of scope.
  * As long as you hold it, you have exclusive access to the referenced resource.
+ *
+ * Comparison operators compare the referenced value.
  */
 template<typename T, typename Lock>
 class MytexGuard
@@ -42,6 +44,10 @@ private:
  * This combines MytexGuard and std::optional and squashes the double
  * dereference that would result from Mytex::TryLock() literally returning
  * std::optional<MytexGuard>.
+ *
+ * Comparison operators follow std::optional rules - the empty guard (and
+ * std::nullopt) compares as less than an engaged lock, and everything else
+ * compares as the guarded value.
  */
 template<typename T, typename Lock>
 class OptionalMytexGuard
@@ -186,4 +192,352 @@ private:
   T mObject;
   mutable Lockable mMutex;
 };
+
+template<typename T, typename Lock, typename U, typename L>
+inline bool
+operator==(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+{
+  return *lhs == *rhs;
+}
+
+template<typename T, typename Lock, typename U, typename L>
+inline bool
+operator!=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U, typename L>
+inline bool
+operator<(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+{
+  return *lhs < *rhs;
+}
+
+template<typename T, typename Lock, typename U, typename L>
+inline bool
+operator>(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U, typename L>
+inline bool
+operator<=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock, typename U, typename L>
+inline bool
+operator>=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator==(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return *lhs == rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator==(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return lhs == *rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator!=(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator!=(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return *lhs < rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return lhs < *rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>=(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>=(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<=(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<=(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator==(const OptionalMytexGuard<T, L1>& lhs,
+           const OptionalMytexGuard<U, L2>& rhs)
+{
+  if (lhs.has_value()) {
+    return rhs.has_value() && *lhs == *rhs;
+  }
+  return !rhs.has_value();
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator!=(const OptionalMytexGuard<T, L1>& lhs,
+           const OptionalMytexGuard<U, L2>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator<(const OptionalMytexGuard<T, L1>& lhs,
+          const OptionalMytexGuard<U, L2>& rhs)
+{
+  if (lhs.has_value()) {
+    return rhs.has_value() && *lhs < *rhs;
+  }
+  return rhs.has_value();
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator>(const OptionalMytexGuard<T, L1>& lhs,
+          const OptionalMytexGuard<U, L2>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator<=(const OptionalMytexGuard<T, L1>& lhs,
+           const OptionalMytexGuard<U, L2>& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename L1, typename U, typename L2>
+inline bool
+operator>=(const OptionalMytexGuard<T, L1>& lhs,
+           const OptionalMytexGuard<U, L2>& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator==(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return lhs.has_value() && *lhs == rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator==(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs.has_value() && lhs == *rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator!=(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator!=(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !lhs.has_value() || *lhs < rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs.has_value() && lhs < *rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<=(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<=(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>=(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>=(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock>
+inline bool
+operator==(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t /*rhs*/)
+{
+  return !lhs.has_value();
+}
+
+template<typename T, typename Lock>
+inline bool
+operator==(std::nullopt_t /*lhs*/, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !rhs.has_value();
+}
+
+template<typename T, typename Lock>
+inline bool
+operator!=(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock>
+inline bool
+operator!=(std::nullopt_t lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock>
+inline bool
+operator<(const OptionalMytexGuard<T, Lock>& /*lhs*/, std::nullopt_t /*rhs*/)
+{
+  return false;
+}
+
+template<typename T, typename Lock>
+inline bool
+operator<(std::nullopt_t /*lhs*/, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs.has_value();
+}
+
+template<typename T, typename Lock>
+inline bool
+operator>(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock>
+inline bool
+operator>(std::nullopt_t lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock>
+inline bool
+operator<=(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock>
+inline bool
+operator<=(std::nullopt_t lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock>
+inline bool
+operator>=(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock>
+inline bool
+operator>=(std::nullopt_t lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs < rhs);
+}
 } // namespace baudvine
