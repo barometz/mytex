@@ -3,6 +3,7 @@
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
+#include <array>
 #include <queue>
 #include <thread>
 
