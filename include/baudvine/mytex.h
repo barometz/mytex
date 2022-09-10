@@ -3,6 +3,7 @@
 #include <cassert>
 #include <mutex>
 #include <optional>
+#include <shared_mutex>
 
 namespace baudvine {
 /**
@@ -81,13 +82,16 @@ private:
 };
 
 /** @brief A mutex that owns the resource it guards. */
-template<typename T, typename Lockable = std::mutex>
+template<typename T, typename Lockable = std::shared_mutex>
 class Mytex
 {
 public:
-  using LockT = std::unique_lock<Lockable>;
-  using Guard = MytexGuard<T, LockT>;
-  using OptionalGuard = OptionalMytexGuard<T, LockT>;
+  using ExclusiveLock = std::unique_lock<Lockable>;
+  using SharedLock = std::shared_lock<Lockable>;
+  using Guard = MytexGuard<T, ExclusiveLock>;
+  using SharedGuard = MytexGuard<const T, SharedLock>;
+  using OptionalGuard = OptionalMytexGuard<T, ExclusiveLock>;
+  using SharedOptionalGuard = OptionalMytexGuard<const T, SharedLock>;
 
   template<typename... Args>
   Mytex(Lockable mutex, Args&&... initialize)
@@ -104,15 +108,26 @@ public:
   }
 
   /**
-   * @brief Lock the contained resource.
+   * @brief Lock the contained resource in exclusive (unique, mutable) mode.
    *
    * @returns A MytexGuard referencing the guarded resource. The lock is
    *          released when the guard goes out of scope.
    */
-  Guard Lock() { return { &mObject, LockT(mMutex) }; }
+  Guard Lock() { return { &mObject, ExclusiveLock(mMutex) }; }
 
   /**
-   * @brief Attempt to lock the contained resource.
+   * @brief Lock the contained resource in shared mode.
+   *
+   * Only available when Lockable is std::shared_mutex or a compatible type.
+   *
+   * @returns A MytexGuard with a const reference to the guarded resource. The
+   *          lock is released when the guard goes out of scope.
+   */
+  SharedGuard LockShared() const { return { &mObject, SharedLock(mMutex) }; }
+
+  /**
+   * @brief Attempt to lock the contained resource in exclusive (unique,
+   *        mutable) mode.
    *
    * @returns An OptionalMytexGuard which references the guarded resource if and
    *          only if the lock is held. If held, the lock is released when the
@@ -120,7 +135,25 @@ public:
    */
   OptionalGuard TryLock()
   {
-    LockT lock(mMutex, std::try_to_lock);
+    ExclusiveLock lock(mMutex, std::try_to_lock);
+    if (lock.owns_lock()) {
+      return { &mObject, std::move(lock) };
+    }
+    return {};
+  }
+
+  /**
+   * @brief Attempt to lock the contained resource in shared mode.
+   *
+   * Only available when Lockable is std::shared_mutex or a compatible type.
+   *
+   * @returns A OptionalMytexGuard which references the guarded resource if and
+   *          only if the lock is held. If held, the lock is released when the
+   *          guard goes out of scope.
+   */
+  SharedOptionalGuard TryLockShared() const
+  {
+    SharedLock lock(mMutex, std::try_to_lock);
     if (lock.owns_lock()) {
       return { &mObject, std::move(lock) };
     }
@@ -129,6 +162,6 @@ public:
 
 private:
   T mObject;
-  Lockable mMutex;
+  mutable Lockable mMutex;
 };
 } // namespace baudvine

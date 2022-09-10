@@ -1,4 +1,4 @@
-#include "baudvine/mytex.h"
+#include <baudvine/mytex.h>
 
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
@@ -45,6 +45,12 @@ public:
     auto string = lines->front();
     lines->pop();
     return string;
+  }
+
+  bool Empty() const
+  {
+    auto lines = mLines.LockShared();
+    return lines->empty();
   }
 
 private:

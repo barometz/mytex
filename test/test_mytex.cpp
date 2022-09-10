@@ -19,6 +19,13 @@ TEST(Mytex, BasicCreateLockDestroy)
   EXPECT_EQ(*underTest.Lock(), 6);
 }
 
+TEST(Mytex, WithStdMutex)
+{
+  baudvine::Mytex<int, std::mutex> underTest(1996);
+  *underTest.Lock() += 4;
+  EXPECT_EQ(*underTest.Lock(), 2000);
+}
+
 TEST(Mytex, GuardAccessors)
 {
   baudvine::Mytex<int> underTest(6);
@@ -90,4 +97,20 @@ TEST(Mytex, MoveMytex)
   baudvine::Mytex<int, std::unique_lock<std::mutex>> moved(
     std::move(underTest));
   EXPECT_EQ(*moved.Lock(), 2022);
+}
+
+TEST(Mytex, SharedLock)
+{
+  baudvine::Mytex<int> underTest(500);
+  {
+    auto guard1 = underTest.LockShared();
+    auto guard2 = underTest.LockShared();
+    auto guard3 = underTest.LockShared();
+    EXPECT_FALSE(static_cast<bool>(underTest.TryLock()));
+    EXPECT_TRUE(static_cast<bool>(underTest.TryLockShared()));
+
+    // does not compile, because *guard3 is const int&.
+    // *guard3 = 4;
+  }
+  EXPECT_TRUE(static_cast<bool>(underTest.TryLock()));
 }
