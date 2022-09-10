@@ -42,6 +42,8 @@ class OptionalMytexGuard {
   [[nodiscard]] bool has_value() const noexcept { return data_.has_value(); }
   [[nodiscard]] explicit operator bool() const noexcept { return has_value(); }
   T& value() { return *data_.value().object; }
+  // The user may call these functions just for the exception, so:
+  // NOLINTNEXTLINE(modernize-use-nodiscard)
   const T& value() const { return *data_.value().object; }
 
   T& operator*() noexcept { return *data_->object; }
