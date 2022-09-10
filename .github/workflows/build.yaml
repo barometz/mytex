@@ -70,6 +70,7 @@ jobs:
       run: >
         cmake -B ${{env.BUILD_FOLDER}}
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        -DCMAKE_CXX_COMPILER=clang++
     - name: clang-tidy
       run: ci/clang-tidy.sh ${{env.BUILD_FOLDER}}
     - uses: asarium/clang-tidy-action@v1
