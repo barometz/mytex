@@ -229,17 +229,12 @@ TEST(Mytex, OptionalGuardComparison)
 
   {
     // Additionally, you can compare with nullopt for emptiness
-    // EXPECT_NE(one.TryLock(), std::nullopt);
-    // EXPECT_GT(one.TryLock(), std::nullopt);
-    // EXPECT_GE(one.TryLock(), std::nullopt);
-    // EXPECT_LT(std::nullopt, one.TryLock());
-    // EXPECT_LE(std::nullopt, one.TryLock());
-    // auto guard = one.Lock();
-    // EXPECT_EQ(one.TryLock(), std::nullopt);
-    // As well as compare to non-optional guards
-    // EXPECT_NE(two.TryLock(), guard);
-    // EXPECT_NE(guard, two.TryLock());
-    // *guard = 2;
-    // EXPECT_EQ(two.TryLock(), guard);
+    EXPECT_NE(one.TryLock(), std::nullopt);
+    EXPECT_GT(one.TryLock(), std::nullopt);
+    EXPECT_GE(one.TryLock(), std::nullopt);
+    EXPECT_LT(std::nullopt, one.TryLock());
+    EXPECT_LE(std::nullopt, one.TryLock());
+    auto guard = one.Lock();
+    EXPECT_EQ(one.TryLock(), std::nullopt);
   }
 }

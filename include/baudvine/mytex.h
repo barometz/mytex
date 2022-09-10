@@ -345,6 +345,78 @@ operator>=(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
   return !(lhs < rhs);
 }
 
+template<typename T, typename Lock>
+inline bool operator==(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t)
+{
+  return !lhs.has_value();
+}
+
+template<typename T, typename Lock>
+inline bool operator==(std::nullopt_t, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !rhs.has_value();
+}
+
+template<typename T, typename Lock>
+inline bool operator!=(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock>
+inline bool operator!=(std::nullopt_t lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock>
+inline bool operator<(const OptionalMytexGuard<T, Lock>&, std::nullopt_t)
+{
+  return false;
+}
+
+template<typename T, typename Lock>
+inline bool operator<(std::nullopt_t, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs.has_value();
+}
+
+template<typename T, typename Lock>
+inline bool operator>(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock>
+inline bool operator>(std::nullopt_t lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock>
+inline bool operator<=(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock>
+inline bool operator<=(std::nullopt_t lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock>
+inline bool operator>=(const OptionalMytexGuard<T, Lock>& lhs, std::nullopt_t rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock>
+inline bool operator>=(std::nullopt_t lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs < rhs);
+}
+
 /** @brief A mutex that owns the resource it guards.
  *
  * By default this uses std::shared_mutex, but any class that supports the
