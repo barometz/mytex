@@ -3,6 +3,7 @@
 #include <cassert>
 #include <mutex>
 #include <optional>
+#include <shared_mutex>
 
 namespace baudvine {
 /**
@@ -81,7 +82,7 @@ private:
 };
 
 /** @brief A mutex that owns the resource it guards. */
-template<typename T, typename Lockable = std::mutex>
+template<typename T, typename Lockable = std::shared_mutex>
 class Mytex
 {
 public:

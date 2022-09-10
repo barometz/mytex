@@ -19,6 +19,13 @@ TEST(Mytex, BasicCreateLockDestroy)
   EXPECT_EQ(*underTest.Lock(), 6);
 }
 
+TEST(Mytex, WithStdMutex)
+{
+  baudvine::Mytex<int, std::mutex> underTest(1996);
+  *underTest.Lock() += 4;
+  EXPECT_EQ(*underTest.Lock(), 2000);
+}
+
 TEST(Mytex, GuardAccessors)
 {
   baudvine::Mytex<int> underTest(6);
