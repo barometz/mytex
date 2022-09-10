@@ -60,9 +60,7 @@ class OptionalMytexGuard {
    * @returns A reference to the guarded object.
    * @throws std::bad_optional_access
    */
-  const T& value() const {
-    return *data_.value();
-  }  // NOLINT(modernize-use-nodiscard)
+  const T& value() const { return *data_.value(); }  // NOLINT(*-use-nodiscard)
 
   /** @returns A reference to the guarded object (unchecked). */
   T& operator*() noexcept { return **data_; }
