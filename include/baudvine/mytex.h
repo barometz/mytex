@@ -41,6 +41,8 @@ class MytexGuard {
 template <typename T, typename Lock>
 class OptionalMytexGuard {
  public:
+  using value_type = T;
+
   OptionalMytexGuard() = default;
   OptionalMytexGuard(T* object, Lock lock)
       : data_(std::in_place, object, std::move(lock)) {}
