@@ -155,6 +155,78 @@ public:
     return !(lhs < rhs);
   }
 
+  friend bool operator==(const OptionalMytexGuard& lhs,
+                         const std::nullopt_t& rhs)
+  {
+    return lhs.mInner == rhs;
+  }
+
+  friend bool operator==(const std::nullopt_t& lhs,
+                         const OptionalMytexGuard& rhs)
+  {
+    return lhs == rhs.mInner;
+  }
+
+  friend bool operator!=(const OptionalMytexGuard& lhs,
+                         const std::nullopt_t& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  friend bool operator!=(const std::nullopt_t& lhs,
+                         const OptionalMytexGuard& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  friend bool operator<(const OptionalMytexGuard& lhs,
+                        const std::nullopt_t& rhs)
+  {
+    return lhs.mInner < rhs;
+  }
+
+  friend bool operator<(const std::nullopt_t& lhs,
+                        const OptionalMytexGuard& rhs)
+  {
+    return lhs < rhs.mInner;
+  }
+
+  friend bool operator>(const OptionalMytexGuard& lhs,
+                        const std::nullopt_t& rhs)
+  {
+    return rhs < lhs;
+  }
+
+  friend bool operator>(const std::nullopt_t& lhs,
+                        const OptionalMytexGuard& rhs)
+  {
+    return rhs < lhs;
+  }
+
+  friend bool operator<=(const OptionalMytexGuard& lhs,
+                         const std::nullopt_t& rhs)
+  {
+    return !(lhs > rhs);
+  }
+
+  friend bool operator<=(const std::nullopt_t& lhs,
+                         const OptionalMytexGuard& rhs)
+  {
+    return !(lhs > rhs);
+  }
+
+  friend bool operator>=(const OptionalMytexGuard& lhs,
+                         const std::nullopt_t& rhs)
+  {
+    return !(lhs < rhs);
+  }
+
+  friend bool operator>=(const std::nullopt_t& lhs,
+                         const OptionalMytexGuard& rhs)
+  {
+    return !(lhs < rhs);
+  }
+
 private:
   std::optional<MytexGuard<T, Lock>> mInner{};
 };
