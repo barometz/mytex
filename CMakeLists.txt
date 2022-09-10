@@ -2,11 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 project(mytex)
 
 option(mytex_TESTS "Build Mytex tests" ON)
-option(mytex_CLANG_TIDY "Run clang-tidy" ON)
-
-if(${mytex_CLANG_TIDY})
-    set(CMAKE_CXX_CLANG_TIDY clang-tidy)
-endif()
+option(mytex_WERROR "Treat warnings as errors" OFF)
 
 add_library(baudvine-mytex INTERFACE)
 
@@ -17,6 +13,12 @@ if(MSVC)
     add_compile_options(
         /W4
     )
+
+    if(${mytex_WERROR})
+        add_compile_options(
+            /WX
+        )
+    endif()
 else()
     add_compile_options(
         -Wall
@@ -24,6 +26,12 @@ else()
         -Wpedantic
         -Werror=return-type
     )
+
+    if(${mytex_WERROR})
+        add_compile_options(
+            -Werror
+        )
+    endif()
 endif()
 
 # Install configuration

@@ -1,0 +1,83 @@
+name: Build and test and lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+  BUILD_FOLDER:  ${{github.workspace}}/build/
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        cxx: [clang++, g++]
+        cxx_version: [17, 20]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{env.BUILD_FOLDER}}
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -DCMAKE_CXX_COMPILER=${{matrix.cxx}}
+        -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+        -Dmytex_WERROR=true
+
+    - name: Build
+      run: cmake --build ${{env.BUILD_FOLDER}} --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure --test-dir ${{env.BUILD_FOLDER}}
+
+  build-windows:
+    strategy:
+      matrix:
+        platform: [Win32, x64]
+        cxx_version: [17, 23]
+
+    runs-on: windows-2022
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{env.BUILD_FOLDER}}
+        -A ${{matrix.platform}}
+        -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+        -Dmytex_WERROR=true
+        -Dgtest_force_shared_crt=ON
+
+    - name: Build
+      run: cmake --build ${{env.BUILD_FOLDER}} --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure --test-dir ${{env.BUILD_FOLDER}}
+
+  linter:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure CMake
+      run: cmake -B ${{env.BUILD_FOLDER}}
+    - name: clang-tidy
+      run: ci/clang-tidy.sh ${{env.BUILD_FOLDER}}
+    - uses: asarium/clang-tidy-action@v1
+      with:
+        fixesFile: ${{env.BUILD_FOLDER}}/clang-fixes.yaml
+
+  formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check formatting
+      run: ci/clang-format.sh
