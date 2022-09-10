@@ -160,6 +160,8 @@ TEST(Mytex, GuardEquality)
   EXPECT_EQ(one.Lock(), two.LockShared());
   *one.Lock() = 5;
   EXPECT_NE(one.LockShared(), two.Lock());
+  EXPECT_EQ(one.Lock(), 5);
+  EXPECT_NE(two.Lock(), 5);
 }
 
 TEST(Mytex, GuardComparison)
@@ -173,6 +175,11 @@ TEST(Mytex, GuardComparison)
   EXPECT_LE(one.LockShared(), one.LockShared());
   EXPECT_LT(one.Lock(), two.LockShared());
   EXPECT_GT(two.Lock(), one.LockShared());
+
+  EXPECT_GT(5U, one.Lock());
+  EXPECT_GE(5U, one.Lock());
+  EXPECT_LE(1U, two.Lock());
+  EXPECT_LT(1U, two.Lock());
 
   *one.Lock() = 2;
   EXPECT_GE(two.LockShared(), one.Lock());

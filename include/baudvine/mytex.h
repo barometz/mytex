@@ -31,46 +31,136 @@ public:
   T* operator->() noexcept { return &**this; }
   const T* operator->() const noexcept { return &**this; }
 
-  template<typename U, typename L>
-  friend bool operator==(const MytexGuard& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return *lhs == *rhs;
-  }
-
-  template<typename U, typename L>
-  friend bool operator!=(const MytexGuard& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return !(lhs == rhs);
-  }
-
-  template<typename U, typename L>
-  friend bool operator<(const MytexGuard& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return *lhs < *rhs;
-  }
-
-  template<typename U, typename L>
-  friend bool operator>(const MytexGuard& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return rhs < lhs;
-  }
-
-  template<typename U, typename L>
-  friend bool operator<=(const MytexGuard& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return !(lhs > rhs);
-  }
-
-  template<typename U, typename L>
-  friend bool operator>=(const MytexGuard& lhs, const MytexGuard<U, L>& rhs)
-  {
-    return !(lhs < rhs);
-  }
-
 private:
   T* mObject;
   Lock mLock;
 };
+
+template<typename T, typename Lock, typename U, typename L>
+bool
+operator==(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+  {
+    return *lhs == *rhs;
+  }
+
+template<typename T, typename Lock, typename U, typename L>
+bool
+operator!=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+template<typename T, typename Lock, typename U, typename L>
+bool
+operator<(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+  {
+    return *lhs < *rhs;
+  }
+
+template<typename T, typename Lock, typename U, typename L>
+bool
+operator>(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+  {
+    return rhs < lhs;
+  }
+
+template<typename T, typename Lock, typename U, typename L>
+bool
+operator<=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+  {
+    return !(lhs > rhs);
+  }
+
+template<typename T, typename Lock, typename U, typename L>
+bool
+operator>=(const MytexGuard<T, Lock>& lhs, const MytexGuard<U, L>& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator==(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return *lhs == rhs;
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator==(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return lhs == *rhs;
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator!=(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator!=(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator<(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return *lhs < rhs;
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator<(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return lhs < *rhs;
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator>(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator>(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator>=(const MytexGuard<T, Lock>& lhs, const U& rhs)
+  {
+    return !(lhs < rhs);
+  }
+
+template<typename T, typename Lock, typename U>
+bool
+operator>=(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator<=(const MytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock, typename U>
+bool
+operator<=(const U& lhs, const MytexGuard<T, Lock>& rhs)
+{
+  return !(lhs > rhs);
+}
 
 /**
  * @brief Same as \c MytexGuard, except it might be empty.
