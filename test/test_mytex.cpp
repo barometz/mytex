@@ -72,3 +72,14 @@ TEST(Mytex, MoveGuard) {
   auto newGuard = std::move(guard);
   EXPECT_FALSE(underTest.TryLock().has_value());
 }
+
+TEST(Mytex, MoveMytex) {
+  // Only works if Lockable is moveable.
+  std::mutex mutex;
+  baudvine::Mytex<int, std::unique_lock<std::mutex>> underTest(
+      std::unique_lock(mutex, std::defer_lock), 2022);
+
+  baudvine::Mytex<int, std::unique_lock<std::mutex>> moved(
+      std::move(underTest));
+  EXPECT_EQ(*moved.Lock(), 2022);
+}

@@ -81,6 +81,10 @@ class Mytex {
   using Guard = MytexGuard<T, LockT>;
   using OptionalGuard = OptionalMytexGuard<T, LockT>;
 
+  template <typename... Args>
+  Mytex(Lockable mutex, Args&&... initialize)
+      : object_(std::forward<Args>(initialize)...), mutex_(std::move(mutex)) {}
+
   /** @brief Construct a new Mytex and initialize the contained resource. */
   template <typename... Args>
   Mytex(Args&&... initialize) : object_(std::forward<Args>(initialize)...) {}
