@@ -17,7 +17,7 @@ jobs:
         cxx: [clang++, g++]
         cxx_version: [17, 20]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v2
@@ -62,12 +62,9 @@ jobs:
       run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure --test-dir ${{env.BUILD_FOLDER}}
 
   linter:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-    - name: Install clang-tidy-14
-      run: sudo apt-get -y install clang-tidy-14
-
     - uses: actions/checkout@v2
     - name: Configure CMake
       run: >
@@ -75,14 +72,12 @@ jobs:
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     - name: clang-tidy
       run: ci/clang-tidy.sh ${{env.BUILD_FOLDER}}
-      env:
-        CLANGTIDY: clang-tidy-14
     - uses: asarium/clang-tidy-action@v1
       with:
         fixesFile: ${{env.BUILD_FOLDER}}/clang-fixes.yaml
 
   formatting:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v2
