@@ -12,23 +12,27 @@ namespace baudvine {
  * \c MytexGuard holds the lock it was created with until it goes out of scope.
  * As long as you hold it, you have exclusive access to the referenced resource.
  */
-template <typename T, typename Lock>
-class MytexGuard {
- public:
-  MytexGuard(T* object, Lock lock) : object_(object), lock_(std::move(lock)) {
-    assert(lock_.owns_lock());
+template<typename T, typename Lock>
+class MytexGuard
+{
+public:
+  MytexGuard(T* object, Lock lock)
+    : mObject(object)
+    , mLock(std::move(lock))
+  {
+    assert(mLock.owns_lock());
   }
 
   /** @returns A reference to the guarded object. */
-  T& operator*() noexcept { return *object_; }
+  T& operator*() noexcept { return *mObject; }
   /** @returns A reference to the guarded object. */
-  const T& operator*() const noexcept { return *object_; }
+  const T& operator*() const noexcept { return *mObject; }
   T* operator->() noexcept { return &**this; }
   const T* operator->() const noexcept { return &**this; }
 
- private:
-  T* object_;
-  Lock lock_;
+private:
+  T* mObject;
+  Lock mLock;
 };
 
 /**
@@ -38,56 +42,66 @@ class MytexGuard {
  * dereference that would result from Mytex::TryLock() literally returning
  * std::optional<MytexGuard>.
  */
-template <typename T, typename Lock>
-class OptionalMytexGuard {
- public:
+template<typename T, typename Lock>
+class OptionalMytexGuard
+{
+public:
   using value_type = T;
 
   OptionalMytexGuard() = default;
   OptionalMytexGuard(T* object, Lock lock)
-      : data_(std::in_place, object, std::move(lock)) {}
+    : mInner(std::in_place, object, std::move(lock))
+  {
+  }
 
   /** @brief Indicates whether this contains a (locked) value. */
-  [[nodiscard]] bool has_value() const noexcept { return data_.has_value(); }
+  [[nodiscard]] bool has_value() const noexcept { return mInner.has_value(); }
   /** @brief Indicates whether this contains a (locked) value. */
   [[nodiscard]] explicit operator bool() const noexcept { return has_value(); }
   /**
    * @returns A reference to the guarded object.
    * @throws std::bad_optional_access
    */
-  T& value() { return *data_.value(); }
+  T& value() { return *mInner.value(); }
   /**
    * @returns A reference to the guarded object.
    * @throws std::bad_optional_access
    */
-  const T& value() const { return *data_.value(); }  // NOLINT(*-use-nodiscard)
+  const T& value() const { return *mInner.value(); } // NOLINT(*-use-nodiscard)
 
   /** @returns A reference to the guarded object (unchecked). */
-  T& operator*() noexcept { return **data_; }
+  T& operator*() noexcept { return **mInner; }
   /** @returns A reference to the guarded object (unchecked). */
-  const T& operator*() const noexcept { return **data_; }
+  const T& operator*() const noexcept { return **mInner; }
   T* operator->() noexcept { return &**this; }
   const T* operator->() const noexcept { return &**this; }
 
- private:
-  std::optional<MytexGuard<T, Lock>> data_{};
+private:
+  std::optional<MytexGuard<T, Lock>> mInner{};
 };
 
 /** @brief A mutex that owns the resource it guards. */
-template <typename T, typename Lockable = std::mutex>
-class Mytex {
- public:
+template<typename T, typename Lockable = std::mutex>
+class Mytex
+{
+public:
   using LockT = std::unique_lock<Lockable>;
   using Guard = MytexGuard<T, LockT>;
   using OptionalGuard = OptionalMytexGuard<T, LockT>;
 
-  template <typename... Args>
+  template<typename... Args>
   Mytex(Lockable mutex, Args&&... initialize)
-      : object_(std::forward<Args>(initialize)...), mutex_(std::move(mutex)) {}
+    : mObject(std::forward<Args>(initialize)...)
+    , mMutex(std::move(mutex))
+  {
+  }
 
   /** @brief Construct a new Mytex and initialize the contained resource. */
-  template <typename... Args>
-  Mytex(Args&&... initialize) : object_(std::forward<Args>(initialize)...) {}
+  template<typename... Args>
+  Mytex(Args&&... initialize)
+    : mObject(std::forward<Args>(initialize)...)
+  {
+  }
 
   /**
    * @brief Lock the contained resource.
@@ -95,7 +109,7 @@ class Mytex {
    * @returns A MytexGuard referencing the guarded resource. The lock is
    *          released when the guard goes out of scope.
    */
-  Guard Lock() { return {&object_, LockT(mutex_)}; }
+  Guard Lock() { return { &mObject, LockT(mMutex) }; }
 
   /**
    * @brief Attempt to lock the contained resource.
@@ -104,16 +118,17 @@ class Mytex {
    *          only if the lock is held. If held, the lock is released when the
    *          guard goes out of scope.
    */
-  OptionalGuard TryLock() {
-    LockT lock(mutex_, std::try_to_lock);
+  OptionalGuard TryLock()
+  {
+    LockT lock(mMutex, std::try_to_lock);
     if (lock.owns_lock()) {
-      return {&object_, std::move(lock)};
+      return { &mObject, std::move(lock) };
     }
     return {};
   }
 
- private:
-  T object_;
-  Lockable mutex_;
+private:
+  T mObject;
+  Lockable mMutex;
 };
-}  // namespace baudvine
+} // namespace baudvine

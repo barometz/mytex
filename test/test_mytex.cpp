@@ -5,19 +5,22 @@
 
 #include <thread>
 
-TEST(Mytex, DefaultCtor) {
+TEST(Mytex, DefaultCtor)
+{
   baudvine::Mytex<int> underTest;
   EXPECT_EQ(*underTest.Lock(), int{});
 }
 
-TEST(Mytex, BasicCreateLockDestroy) {
+TEST(Mytex, BasicCreateLockDestroy)
+{
   baudvine::Mytex<int> underTest(5);
   EXPECT_EQ(*underTest.Lock(), 5);
   *underTest.Lock() = 6;
   EXPECT_EQ(*underTest.Lock(), 6);
 }
 
-TEST(Mytex, GuardAccessors) {
+TEST(Mytex, GuardAccessors)
+{
   baudvine::Mytex<int> underTest(6);
   auto number = underTest.Lock();
   EXPECT_EQ(*number, 6);
@@ -28,7 +31,8 @@ TEST(Mytex, GuardAccessors) {
   EXPECT_EQ(guard->size(), 1);
 }
 
-TEST(Mytex, TryLock) {
+TEST(Mytex, TryLock)
+{
   baudvine::Mytex<int> underTest(6);
 
   {
@@ -39,7 +43,8 @@ TEST(Mytex, TryLock) {
   EXPECT_THAT(underTest.TryLock(), testing::Optional(6));
 }
 
-TEST(Mytex, TryLockFailure) {
+TEST(Mytex, TryLockFailure)
+{
   baudvine::Mytex<int> underTest(6);
   auto number = underTest.TryLock();
 
@@ -51,7 +56,8 @@ TEST(Mytex, TryLockFailure) {
   }).join();
 }
 
-TEST(Mytex, OptionalGuardAccessors) {
+TEST(Mytex, OptionalGuardAccessors)
+{
   baudvine::Mytex<int> underTest(6);
   auto number = underTest.TryLock();
 
@@ -66,20 +72,22 @@ TEST(Mytex, OptionalGuardAccessors) {
   EXPECT_EQ(guard->size(), 1);
 }
 
-TEST(Mytex, MoveGuard) {
+TEST(Mytex, MoveGuard)
+{
   baudvine::Mytex<int> underTest;
   auto guard = underTest.Lock();
   auto newGuard = std::move(guard);
   EXPECT_FALSE(underTest.TryLock().has_value());
 }
 
-TEST(Mytex, MoveMytex) {
+TEST(Mytex, MoveMytex)
+{
   // Only works if Lockable is moveable.
   std::mutex mutex;
   baudvine::Mytex<int, std::unique_lock<std::mutex>> underTest(
-      std::unique_lock(mutex, std::defer_lock), 2022);
+    std::unique_lock(mutex, std::defer_lock), 2022);
 
   baudvine::Mytex<int, std::unique_lock<std::mutex>> moved(
-      std::move(underTest));
+    std::move(underTest));
   EXPECT_EQ(*moved.Lock(), 2022);
 }
