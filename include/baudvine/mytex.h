@@ -86,9 +86,12 @@ template<typename T, typename Lockable = std::shared_mutex>
 class Mytex
 {
 public:
-  using LockT = std::unique_lock<Lockable>;
-  using Guard = MytexGuard<T, LockT>;
-  using OptionalGuard = OptionalMytexGuard<T, LockT>;
+  using MutLock = std::unique_lock<Lockable>;
+  using ConstLock = std::shared_lock<Lockable>;
+  using MutGuard = MytexGuard<T, MutLock>;
+  using ConstGuard = MytexGuard<const T, ConstLock>;
+  using MutOptionalGuard = OptionalMytexGuard<T, MutLock>;
+  using ConstOptionalGuard = OptionalMytexGuard<const T, ConstLock>;
 
   template<typename... Args>
   Mytex(Lockable mutex, Args&&... initialize)
@@ -105,23 +108,52 @@ public:
   }
 
   /**
-   * @brief Lock the contained resource.
+   * @brief Lock the contained resource in exclusive (unique, mutable) mode.
    *
    * @returns A MytexGuard referencing the guarded resource. The lock is
    *          released when the guard goes out of scope.
    */
-  Guard Lock() { return { &mObject, LockT(mMutex) }; }
+  MutGuard Lock() { return { &mObject, MutLock(mMutex) }; }
 
   /**
-   * @brief Attempt to lock the contained resource.
+   * @brief Lock the contained resource in shared mode.
    *
-   * @returns An OptionalMytexGuard which references the guarded resource if and
+   * Only available when Lockable is std::shared_mutex or a compatible type.
+   *
+   * @returns A MytexGuard with a const reference to the guarded resource. The
+   *          lock is released when the guard goes out of scope.
+   */
+  ConstGuard LockConst() const { return { &mObject, ConstLock(mMutex) }; }
+
+  /**
+   * @brief Attempt to lock the contained resource in exclusive (unique,
+   *        mutable) mode.
+   *
+   * @returns A MutOptionalGuard which references the guarded resource if and
    *          only if the lock is held. If held, the lock is released when the
    *          guard goes out of scope.
    */
-  OptionalGuard TryLock()
+  MutOptionalGuard TryLock()
   {
-    LockT lock(mMutex, std::try_to_lock);
+    MutLock lock(mMutex, std::try_to_lock);
+    if (lock.owns_lock()) {
+      return { &mObject, std::move(lock) };
+    }
+    return {};
+  }
+
+  /**
+   * @brief Attempt to lock the contained resource in shared mode.
+   * 
+   * Only available when Lockable is std::shared_mutex or a compatible type.
+   *
+   * @returns An ConstOptionalGuard which references the guarded resource if and
+   *          only if the lock is held. If held, the lock is released when the
+   *          guard goes out of scope.
+   */
+  ConstOptionalGuard TryLockConst() const
+  {
+    ConstLock lock(mMutex, std::try_to_lock);
     if (lock.owns_lock()) {
       return { &mObject, std::move(lock) };
     }
@@ -130,6 +162,6 @@ public:
 
 private:
   T mObject;
-  Lockable mMutex;
+  mutable Lockable mMutex;
 };
 } // namespace baudvine

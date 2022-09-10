@@ -98,3 +98,19 @@ TEST(Mytex, MoveMytex)
     std::move(underTest));
   EXPECT_EQ(*moved.Lock(), 2022);
 }
+
+TEST(Mytex, SharedLock)
+{
+  baudvine::Mytex<int> underTest(500);
+  {
+    auto guard1 = underTest.LockConst();
+    auto guard2 = underTest.LockConst();
+    auto guard3 = underTest.LockConst();
+    EXPECT_FALSE(static_cast<bool>(underTest.TryLock()));
+    EXPECT_TRUE(static_cast<bool>(underTest.TryLockConst()));
+  }
+  EXPECT_TRUE(static_cast<bool>(underTest.TryLock()));
+
+  // does not compile, because *guard3 is const int&.
+  // *guard3 = 4;
+}
