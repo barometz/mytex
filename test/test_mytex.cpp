@@ -227,14 +227,12 @@ TEST(Mytex, OptionalGuardComparison)
   // quite work, so you need to explicitly deref in that case.
   EXPECT_LT(one.TryLock(), *two.Lock());
 
-  {
-    // Additionally, you can compare with nullopt for emptiness
-    EXPECT_NE(one.TryLock(), std::nullopt);
-    EXPECT_GT(one.TryLock(), std::nullopt);
-    EXPECT_GE(one.TryLock(), std::nullopt);
-    EXPECT_LT(std::nullopt, one.TryLock());
-    EXPECT_LE(std::nullopt, one.TryLock());
-    auto guard = one.Lock();
-    EXPECT_EQ(one.TryLock(), std::nullopt);
-  }
+  // Additionally, you can compare with nullopt for emptiness
+  EXPECT_NE(one.TryLock(), std::nullopt);
+  EXPECT_GT(one.TryLock(), std::nullopt);
+  EXPECT_GE(one.TryLock(), std::nullopt);
+  EXPECT_LT(std::nullopt, one.TryLock());
+  EXPECT_LE(std::nullopt, one.TryLock());
+  auto guard = one.Lock();
+  EXPECT_EQ(one.TryLock(), std::nullopt);
 }
