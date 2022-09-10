@@ -153,8 +153,8 @@ TEST(Mytex, SharedLock)
 
 TEST(Mytex, GuardEquality)
 {
-  baudvine::Mytex<int16_t> one(6);
-  baudvine::Mytex<int32_t> two(6);
+  baudvine::Mytex<int32_t> one(6);
+  baudvine::Mytex<int64_t> two(6);
 
   EXPECT_EQ(one.LockShared(), one.LockShared());
   EXPECT_EQ(one.Lock(), two.LockShared());
@@ -166,8 +166,8 @@ TEST(Mytex, GuardEquality)
 
 TEST(Mytex, GuardComparison)
 {
-  baudvine::Mytex<uint16_t> one(1);
-  baudvine::Mytex<uint32_t> two(2);
+  baudvine::Mytex<uint32_t> one(1U);
+  baudvine::Mytex<uint64_t> two(2U);
 
   EXPECT_GE(two.Lock(), one.LockShared());
   EXPECT_GE(two.LockShared(), two.LockShared());
@@ -192,8 +192,8 @@ TEST(Mytex, GuardComparison)
 
 TEST(Mytex, OptionalGuardComparison)
 {
-  baudvine::Mytex<uint16_t> one(1);
-  baudvine::Mytex<uint32_t> two(2);
+  baudvine::Mytex<uint32_t> one(1U);
+  baudvine::Mytex<uint64_t> two(2U);
 
   // The basics are passed on to MytexGuard
   EXPECT_EQ(one.TryLockShared(), one.TryLockShared());
