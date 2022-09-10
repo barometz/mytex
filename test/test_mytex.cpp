@@ -150,3 +150,35 @@ TEST(Mytex, SharedLock)
   // again.
   EXPECT_THAT(underTest.TryLock(), testing::Optional(500));
 }
+
+TEST(Mytex, GuardEquality)
+{
+  baudvine::Mytex<int16_t> one(6);
+  baudvine::Mytex<int32_t> two(6);
+
+  EXPECT_EQ(one.LockShared(), one.LockShared());
+  EXPECT_EQ(one.Lock(), two.LockShared());
+  *one.Lock() = 5;
+  EXPECT_NE(one.LockShared(), two.Lock());
+}
+
+TEST(Mytex, GuardComparison)
+{
+  baudvine::Mytex<uint16_t> one(1);
+  baudvine::Mytex<uint32_t> two(2);
+
+  EXPECT_GE(two.Lock(), one.LockShared());
+  EXPECT_GE(two.LockShared(), two.LockShared());
+  EXPECT_LE(one.Lock(), two.LockShared());
+  EXPECT_LE(one.LockShared(), one.LockShared());
+  EXPECT_LT(one.Lock(), two.LockShared());
+  EXPECT_GT(two.Lock(), one.LockShared());
+
+  *one.Lock() = 2;
+  EXPECT_GE(two.LockShared(), one.Lock());
+  EXPECT_LE(one.LockShared(), two.Lock());
+
+  *two.Lock() = 1;
+  EXPECT_LT(two.LockShared(), one.Lock());
+  EXPECT_GT(one.LockShared(), two.Lock());
+}

@@ -31,6 +31,48 @@ public:
   T* operator->() noexcept { return &**this; }
   const T* operator->() const noexcept { return &**this; }
 
+  template<typename U, typename L>
+  friend bool operator==(const MytexGuard<T, Lock>& lhs,
+                         const MytexGuard<U, L>& rhs)
+  {
+    return *lhs == *rhs;
+  }
+
+  template<typename U, typename L>
+  friend bool operator!=(const MytexGuard<T, Lock>& lhs,
+                         const MytexGuard<U, L>& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  template<typename U, typename L>
+  friend bool operator<(const MytexGuard<T, Lock>& lhs,
+                        const MytexGuard<U, L>& rhs)
+  {
+    return *lhs < *rhs;
+  }
+
+  template<typename U, typename L>
+  friend bool operator>(const MytexGuard<T, Lock>& lhs,
+                        const MytexGuard<U, L>& rhs)
+  {
+    return rhs < lhs;
+  }
+
+  template<typename U, typename L>
+  friend bool operator<=(const MytexGuard<T, Lock>& lhs,
+                         const MytexGuard<U, L>& rhs)
+  {
+    return !(lhs > rhs);
+  }
+
+  template<typename U, typename L>
+  friend bool operator>=(const MytexGuard<T, Lock>& lhs,
+                         const MytexGuard<U, L>& rhs)
+  {
+    return !(lhs < rhs);
+  }
+
 private:
   T* mObject;
   Lock mLock;
