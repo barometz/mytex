@@ -215,6 +215,18 @@ TEST(Mytex, OptionalGuardComparison)
   EXPECT_LE(three.TryLock(), one.TryLock());
   EXPECT_GE(one.TryLock(), three.TryLock());
 
+  // Comparison with value type, just like MytexGuard
+  EXPECT_EQ(one.TryLock(), 1U);
+  EXPECT_NE(two.TryLock(), 5U);
+  EXPECT_GT(two.TryLock(), 1U);
+  EXPECT_GE(two.TryLock(), 1U);
+  EXPECT_LT(0U, one.TryLock());
+  EXPECT_LE(0U, one.TryLock());
+
+  // Comparison between MytexGuard and OptionalMytexGuard unfortunately doesn't
+  // quite work, so you need to explicitly deref in that case.
+  EXPECT_LT(one.TryLock(), *two.Lock());
+
   {
     // Additionally, you can compare with nullopt for emptiness
     // EXPECT_NE(one.TryLock(), std::nullopt);

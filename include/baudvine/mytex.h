@@ -261,6 +261,90 @@ operator>=(const OptionalMytexGuard<T, L1>& lhs,
   return !(lhs < rhs);
 }
 
+template<typename T, typename Lock, typename U>
+inline bool
+operator==(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return lhs.has_value() && *lhs == rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator==(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs.has_value() && lhs == *rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator!=(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator!=(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs == rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !lhs.has_value() || *lhs < rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs.has_value() && lhs < *rhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return rhs < lhs;
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<=(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator<=(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs > rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>=(const OptionalMytexGuard<T, Lock>& lhs, const U& rhs)
+{
+  return !(lhs < rhs);
+}
+
+template<typename T, typename Lock, typename U>
+inline bool
+operator>=(const U& lhs, const OptionalMytexGuard<T, Lock>& rhs)
+{
+  return !(lhs < rhs);
+}
+
 /** @brief A mutex that owns the resource it guards.
  *
  * By default this uses std::shared_mutex, but any class that supports the
