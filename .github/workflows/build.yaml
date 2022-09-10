@@ -11,7 +11,7 @@ env:
   BUILD_FOLDER:  ${{github.workspace}}/build/
 
 jobs:
-  build:
+  build :
     strategy:
       matrix:
         cxx: [clang++, g++]
@@ -67,7 +67,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Configure CMake
-      run: cmake -B ${{env.BUILD_FOLDER}}
+      run: >
+        cmake -B ${{env.BUILD_FOLDER}}
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     - name: clang-tidy
       run: ci/clang-tidy.sh ${{env.BUILD_FOLDER}}
     - uses: asarium/clang-tidy-action@v1
