@@ -65,6 +65,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Install clang-tidy-14
+      run: sudo apt-get -y install clang-tidy-14
+
     - uses: actions/checkout@v2
     - name: Configure CMake
       run: >
@@ -72,6 +75,8 @@ jobs:
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     - name: clang-tidy
       run: ci/clang-tidy.sh ${{env.BUILD_FOLDER}}
+      env:
+        CLANGTIDY: clang-tidy-14
     - uses: asarium/clang-tidy-action@v1
       with:
         fixesFile: ${{env.BUILD_FOLDER}}/clang-fixes.yaml
