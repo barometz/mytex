@@ -17,7 +17,7 @@ public:
     std::cout << queue.size() << "\n";
   }
 
-  void Push(std::string string)
+  void Push(const std::string& string)
   {
     // To use the guarded queue, you must lock the queue.
     auto lines = mLines.Lock();
@@ -39,11 +39,11 @@ public:
       // Much like std::scoped_lock, the guard is released and the mutex
       // unlocked whenever you exit this scope by returning or because of an
       // exception.
-    } else {
-      auto string = lines->front();
-      lines->pop();
-      return string;
     }
+
+    auto string = lines->front();
+    lines->pop();
+    return string;
   }
 
 private:
@@ -78,7 +78,7 @@ TEST(Example, Queue)
     }
   });
 
-  for (auto& line : input) {
+  for (const auto& line : input) {
     queue.Push(line);
   }
 
