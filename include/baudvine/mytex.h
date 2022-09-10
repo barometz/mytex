@@ -4,7 +4,6 @@
 #include <optional>
 
 namespace baudvine {
-namespace detail {
 /** @brief A lock_guard-a-like that includes a reference to the guarded
  * resource.
  *
@@ -57,7 +56,6 @@ class OptionalMytexGuard {
   };
   std::optional<Data> data_{};
 };
-}  // namespace detail
 
 /** @brief A mutex that owns the resource it guards.
  */
@@ -65,8 +63,8 @@ template <typename T, typename Lockable = std::mutex>
 class Mytex {
  public:
   using LockT = std::unique_lock<Lockable>;
-  using Guard = detail::MytexGuard<T, LockT>;
-  using OptionalGuard = detail::OptionalMytexGuard<T, LockT>;
+  using Guard = MytexGuard<T, LockT>;
+  using OptionalGuard = OptionalMytexGuard<T, LockT>;
 
   template <typename... Args>
   Mytex(Args&&... initialize) : object_(std::forward<Args>(initialize)...) {}
