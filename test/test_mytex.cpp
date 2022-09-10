@@ -103,11 +103,11 @@ TEST(Mytex, SharedLock)
 {
   baudvine::Mytex<int> underTest(500);
   {
-    auto guard1 = underTest.LockConst();
-    auto guard2 = underTest.LockConst();
-    auto guard3 = underTest.LockConst();
+    auto guard1 = underTest.LockShared();
+    auto guard2 = underTest.LockShared();
+    auto guard3 = underTest.LockShared();
     EXPECT_FALSE(static_cast<bool>(underTest.TryLock()));
-    EXPECT_TRUE(static_cast<bool>(underTest.TryLockConst()));
+    EXPECT_TRUE(static_cast<bool>(underTest.TryLockShared()));
   }
   EXPECT_TRUE(static_cast<bool>(underTest.TryLock()));
 

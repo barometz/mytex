@@ -123,7 +123,7 @@ public:
    * @returns A MytexGuard with a const reference to the guarded resource. The
    *          lock is released when the guard goes out of scope.
    */
-  ConstGuard LockConst() const { return { &mObject, ConstLock(mMutex) }; }
+  ConstGuard LockShared() const { return { &mObject, ConstLock(mMutex) }; }
 
   /**
    * @brief Attempt to lock the contained resource in exclusive (unique,
@@ -151,7 +151,7 @@ public:
    *          only if the lock is held. If held, the lock is released when the
    *          guard goes out of scope.
    */
-  ConstOptionalGuard TryLockConst() const
+  ConstOptionalGuard TryLockShared() const
   {
     ConstLock lock(mMutex, std::try_to_lock);
     if (lock.owns_lock()) {
