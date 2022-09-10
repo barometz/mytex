@@ -108,9 +108,9 @@ TEST(Mytex, SharedLock)
     auto guard3 = underTest.LockShared();
     EXPECT_FALSE(static_cast<bool>(underTest.TryLock()));
     EXPECT_TRUE(static_cast<bool>(underTest.TryLockShared()));
+
+    // does not compile, because *guard3 is const int&.
+    // *guard3 = 4;
   }
   EXPECT_TRUE(static_cast<bool>(underTest.TryLock()));
-
-  // does not compile, because *guard3 is const int&.
-  // *guard3 = 4;
 }
